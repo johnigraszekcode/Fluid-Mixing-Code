@@ -610,10 +610,10 @@ def run_geodesic_equations(settings: Settings) -> dict:
     """Section 6.1: the coupled (rho, lambda) geodesic system.
 
     rho and lambda are transported together by v = Pi[Lap^-1(rho grad lambda)],
-    which is rebuilt from the state at every step.  Both use the advective
-    upwind scheme; under incompressibility the advective and conservative forms
-    agree analytically, and using the advective one keeps the two equations
-    symmetric.
+    which is rebuilt from the state at every step.  Both use the conservative
+    flux-form upwind scheme (same as Section 7.1); under incompressibility the
+    advective and conservative forms agree analytically, and using the
+    conservative one keeps mass exact and the two equations symmetric.
     """
     settings.validate()
 
@@ -644,8 +644,8 @@ def run_geodesic_equations(settings: Settings) -> dict:
         dt = cfl_timestep(U, V, grid, settings.cfl, max_dt)
 
         # Both fields ride the same velocity, so step them off the same v.
-        rho_next = upwind_advection_step(rho, U, V, grid, dt)
-        lam = upwind_advection_step(lam, U, V, grid, dt)
+        rho_next = conservative_upwind_step(rho, U, V, grid, dt)
+        lam = conservative_upwind_step(lam, U, V, grid, dt)
         rho = rho_next
 
         t += dt

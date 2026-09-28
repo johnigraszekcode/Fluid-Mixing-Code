@@ -78,11 +78,14 @@ inline; it imports `mixing.py`, so keep them in the same directory.
 
 ## Numerical scheme
 
-Scalar advection `d_t u = -grad(u) . v` uses first-order upwind differences,
-selected pointwise from the sign of the local velocity. The continuity equation
-`d_t rho = -div(rho v)` uses the conservative flux form of the same scheme, so
-mass is preserved to round-off; face velocities are averaged from neighbouring
-cells and the upwind side decides which cell value is carried.
+Both systems use the conservative flux form of first-order upwind differences,
+selected pointwise from the sign of the local velocity, so mass is preserved to
+round-off for every transported field (`rho` and `lambda` in the geodesic
+system, `rho` in the gradient flow); face velocities are averaged from
+neighbouring cells and the upwind side decides which cell value is carried.
+Under incompressibility the advective and conservative forms of the transport
+equation agree analytically, so this is a discretization choice, not a change
+to the continuous dynamics.
 
 The inverse Laplacian and the Leray projection are applied in Fourier space.
 Each component of `rho grad(potential)` is zero-mean centred before the solve,
@@ -101,9 +104,10 @@ Every run reports:
 
 - **mass and `L^2` norm of `rho`.** Both are conserved by the exact dynamics —
   under incompressibility the level sets of `rho` are only rearranged, so the
-  signature `rho # L` and hence every `L^p` norm is invariant. Drift measures
-  the dissipation of the first-order upwind scheme. The gradient flow conserves
-  mass exactly by construction.
+  signature `rho # L` and hence every `L^p` norm is invariant. Mass is
+  conserved by both solvers to round-off, by construction of the conservative
+  upwind scheme; `L^2` still drifts under discretization, and that drift
+  measures the numerical dissipation of the first-order scheme.
 - **the `H^-1` energy**, recorded at every step rather than only at the
   snapshots. For the gradient flow the energy dissipation equality says it can
   never increase, which is the sharpest available check that the code really is
